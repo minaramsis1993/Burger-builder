@@ -1,0 +1,13 @@
+.ContactData {
+  max-width: 1000px;
+  margin: auto;
+  border: 1px solid #999;
+  padding: 1rem;
+  box-shadow: 0 2px 2px #eee;
+  text-align: center;
+}
+
+input {
+  display: block;
+  margin: 0.5rem 0;
+}

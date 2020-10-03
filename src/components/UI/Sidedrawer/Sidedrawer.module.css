@@ -1,0 +1,27 @@
+.Sidedrawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  height: 100vh;
+  max-width: 70%;
+  background-color: white;
+  /* ABOVE MODAL  */
+  z-index: 200;
+  padding: 1rem;
+  transition: all 0.5s ease-out;
+}
+
+@media (min-width: 600px) {
+  .Sidedrawer {
+    display: none;
+  }
+}
+
+.Open {
+  transform: translateX(0);
+}
+.Close {
+  transform: translateX(-1000px);
+}
