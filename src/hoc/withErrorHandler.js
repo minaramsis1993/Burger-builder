@@ -8,7 +8,7 @@ export default function withErrorHandler(WrappedComponent, axios) {
       errMsg: null,
     };
     // DOING so before mounting its children .. it will watch for reqs && ress for them
-    // NOT AFTER THEY ARE ALREADY RENDERED .. TO START WATHING FOR REQS & RESS ;) 
+    // NOT AFTER THEY ARE ALREADY RENDERED .. TO START WATHING FOR REQS & RESS ;)
     UNSAFE_componentWillMount() {
       const self = this;
       this.requestInterceptor = axios.interceptors.request.use(
@@ -59,7 +59,7 @@ export default function withErrorHandler(WrappedComponent, axios) {
           >
             {this.state.errMsg}
           </Modal>
-          <WrappedComponent />
+          <WrappedComponent {...this.props} />
         </React.Fragment>
       );
     }

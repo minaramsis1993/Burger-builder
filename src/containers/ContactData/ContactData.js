@@ -85,6 +85,7 @@ class ContactData extends Component {
       },
     ],
     isSpinning: false,
+    isFormValid: false,
   };
 
   submitHandler = (e) => {
@@ -144,12 +145,25 @@ class ContactData extends Component {
     const formClone = [...this.state.orderForm];
     formClone[index]['touched'] = true;
     formClone[index]['value'] = e.target.value;
-    formClone[index]['isValid'] = this.checkValidation(
-      e.target.value,
-      formClone[index]['validation']
-    );
+    formClone[index]['isValid'] = formClone[index]['validation']
+      ? this.checkValidation(e.target.value, formClone[index]['validation'])
+      : true;
     this.setState({ orderForm: formClone });
   };
+
+  componentDidUpdate() {
+    let isFormValid = true;
+    for (let i = 0; i < this.state.orderForm.length; i++) {
+      const el = this.state.orderForm[i];
+      console.log(el);
+      if (el.validation && !el.isValid) {
+        isFormValid = false;
+      }
+    }
+    if (this.state.isFormValid !== isFormValid) {
+      this.setState({ isFormValid: isFormValid });
+    }
+  }
 
   render() {
     return (
@@ -167,12 +181,18 @@ class ContactData extends Component {
                 label={el.elementconfig.label}
                 elementconfig={el.elementconfig}
                 onChangeHandler={this.onChangeHandler.bind(this, i)}
-                isValid={el.isValid}
-                isTouched={el.touched}
                 shouldValidate={el.validation}
+                isTouched={el.touched}
+                isValid={el.isValid}
               />
             ))}
-            <Button type={'success'} clickHandler={this.submitHandler}>
+            <p>{this.state.isFormValid ? 'FORM VALID' : 'NOT VALID'}</p>
+
+            <Button
+              type={'success'}
+              clickHandler={this.submitHandler}
+              isDisabled={!this.state.isFormValid}
+            >
               Submit
             </Button>
           </form>

@@ -6,7 +6,8 @@ export default function OrderSummary({
   cancelOrderHandler,
   approveOrderHandler,
 }) {
-  const { ingredients, totalPrice, canPurchase } = curState;
+  const { ingredients, totalPrice } = curState;
+  console.log(curState);
   const ingrsArr = [];
   for (let prop in ingredients) {
     ingrsArr.push({

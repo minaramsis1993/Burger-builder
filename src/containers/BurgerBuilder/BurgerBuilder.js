@@ -8,18 +8,11 @@ import axios from '../../axios-orders';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import withErrorHandler from '../../hoc/withErrorHandler';
 import { withRouter } from 'react-router-dom';
-
-const INGREDIENT_PRICES = {
-  meat: 1.3,
-  salad: 0.5,
-  cheese: 0.4,
-  bacon: 0.7,
-};
+import { connect } from 'react-redux';
+import * as actionTypes from '../../store/actions';
 
 class BurgerBuilder extends Component {
   state = {
-    ingredients: null,
-    totalPrice: 4,
     canPurchase: false,
     isOrderNowClicked: false,
     isSpinning: false,
@@ -52,45 +45,13 @@ class BurgerBuilder extends Component {
   };
 
   addIngrHandler = (type) => {
-    let clonedIngs = { ...this.state.ingredients };
-    if (!clonedIngs[type]) {
-      clonedIngs[type] = 1;
-    } else {
-      clonedIngs[type]++;
-    }
-
-    this.setState(
-      {
-        ingredients: clonedIngs,
-        totalPrice: this.state.totalPrice + INGREDIENT_PRICES[type],
-      },
-      () => {
-        // console.log(this.state);
-        this.updateCanPurchase();
-      }
-    );
+    this.props.addIngr(type);
+    this.updateCanPurchase();
   };
 
   removeIngrHandler = (type) => {
-    let clonedIngs = { ...this.state.ingredients };
-    if (clonedIngs[type] > 1) {
-      clonedIngs[type]--;
-    } else {
-      delete clonedIngs[type];
-    }
-
-    this.setState(
-      {
-        ingredients: clonedIngs,
-        totalPrice: this.state.ingredients[type]
-          ? this.state.totalPrice - INGREDIENT_PRICES[type]
-          : this.state.totalPrice,
-      },
-      () => {
-        console.log(this.state);
-        this.updateCanPurchase();
-      }
-    );
+    this.props.removeIngr(type);
+    this.updateCanPurchase();
   };
 
   orderNowHandler = () => {
@@ -120,7 +81,7 @@ class BurgerBuilder extends Component {
           encodeURIComponent(this.state.ingredients[i])
       );
     }
-    qParams.push('total-price=' + encodeURIComponent(this.state.totalPrice));
+    qParams.push('total-price=' + encodeURIComponent(this.props.totalPrice));
     return qParams.join('&');
   }
 
@@ -132,45 +93,18 @@ class BurgerBuilder extends Component {
       pathname: '/checkout',
       search: '?' + res,
     });
-
-    // this.setState({ isSpinning: true }, () => {
-    //   // console.log(this.state);
-    //   axios
-    //     .post('/orders.json', {
-    //       ingredients: this.state.ingredients,
-    //       price: this.state.totalPrice,
-    //       customer: {
-    //         name: 'Mina',
-    //         address: {
-    //           street: 'asdfasdf',
-    //           zipcode: '1234',
-    //           country: 'Australia',
-    //         },
-    //         email: 'minaramsis1993@gmail.com',
-    //       },
-    //     })
-    //     .then((res) => {
-    //       console.log(res);
-    //       this.setState({ isSpinning: false, isOrderNowClicked: false });
-    //       // this.props.history.push({ pathname: '/checkout' });
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //       this.setState({ isSpinning: false, isOrderNowClicked: false });
-    //     });
-    // });
   };
 
   render() {
     let toRender = null;
-    if (this.state.ingredients) {
+    if (this.props.ingredients) {
       toRender = (
         <div>
-          <Burger ings={this.state.ingredients}></Burger>
+          <Burger ings={this.props.ingredients}></Burger>
           <BuildControls
             addIngrHandler={this.addIngrHandler}
             removeIngrHandler={this.removeIngrHandler}
-            price={this.state.totalPrice}
+            price={this.props.totalPrice}
             canPurchase={this.state.canPurchase}
             orderNowHandler={this.orderNowHandler}
           ></BuildControls>
@@ -184,6 +118,10 @@ class BurgerBuilder extends Component {
       toRender = null;
     }
 
+    const curState = {
+      ingredients: this.props.ingredients,
+      totalPrice: this.props.totalPrice,
+    };
     return (
       <React.Fragment>
         <Modal
@@ -194,7 +132,7 @@ class BurgerBuilder extends Component {
             <Spinner></Spinner>
           ) : (
             <OrderSummary
-              curState={this.state}
+              curState={curState}
               cancelOrderHandler={this.cancelOrderHandler}
               approveOrderHandler={this.approveOrderHandler}
             ></OrderSummary>
@@ -207,4 +145,27 @@ class BurgerBuilder extends Component {
 }
 
 // export default BurgerBuilder;
-export default withErrorHandler(withRouter(BurgerBuilder), axios);
+const mapStateToProps = (state) => {
+  return {
+    ingredients: state.ingredients,
+    totalPrice: state.totalPrice,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addIngr: (ingType) =>
+      dispatch({
+        type: actionTypes.ADD_INGREDIENT,
+        payload: { type: ingType },
+      }),
+    removeIngr: (ingType) =>
+      dispatch({
+        type: actionTypes.ADD_INGREDIENT,
+        payload: { type: ingType },
+      }),
+  };
+};
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withErrorHandler(withRouter(BurgerBuilder), axios));

@@ -4,7 +4,6 @@ import classes from './Input.module.css';
 export default function Input(props) {
   let inputField = null;
   const config = { ...props.elementconfig };
-  console.log(props);
   switch (props.elementtype) {
     case 'input':
       inputField = (
